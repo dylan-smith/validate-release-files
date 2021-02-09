@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -50,51 +51,31 @@ namespace ValidateReleaseFiles
 
         private static bool ValidateFiles(string releasePath, string repoPath)
         {
-            var releaseFiles = GetReleaseFiles(releasePath);
+            var releaseFiles = GetFileHashes(releasePath).ToList();
+            var repoFiles = GetFileHashes(repoPath).ToList();
 
             foreach (var releaseFile in releaseFiles)
             {
                 Console.WriteLine($"Checking file {releaseFile.filePath} [{releaseFile.hash}]...");
 
-                var match = CheckFile(releaseFile, repoPath);
-                
-                if (string.IsNullOrWhiteSpace(match))
+                var match = repoFiles.FirstOrDefault(x => x.fileName == releaseFile.fileName && x.filePath != releaseFile.filePath && x.hash == releaseFile.hash);
+
+                if (match == default)
                 {
                     Console.Error.WriteLine($"ERROR: Cannot find a file that matches both filename and checksum [{releaseFile.fileName}]");
 
                     return false;
                 }
 
-                Console.WriteLine($"MATCH FOUND! ({match})");
+                Console.WriteLine($"MATCH FOUND! ({match.filePath})");
             }
 
             return true;
         }
 
-        private static string CheckFile((string fileName, string filePath, string hash) releaseFile, string repoPath)
+        private static IEnumerable<(string fileName, string filePath, string hash)> GetFileHashes(string path)
         {
-            var files = Directory.GetFiles(repoPath, "*", SearchOption.AllDirectories);
-
-            foreach (var filePath in files)
-            {
-                if (Path.GetFileName(filePath) == releaseFile.fileName)
-                {
-                    if (filePath != releaseFile.filePath)
-                    {
-                        if (HashFile(filePath) == releaseFile.hash)
-                        {
-                            return filePath;
-                        }
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private static IEnumerable<(string fileName, string filePath, string hash)> GetReleaseFiles(string releasePath)
-        {
-            var files = Directory.GetFiles(releasePath);
+            var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
 
             foreach (var filePath in files)
             {
