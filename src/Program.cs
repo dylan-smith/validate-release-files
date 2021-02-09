@@ -51,7 +51,9 @@ namespace ValidateReleaseFiles
 
         private static bool ValidateFiles(string releasePath, string repoPath)
         {
+            Console.WriteLine("Processing Release Files...");
             var releaseFiles = GetFileHashes(releasePath).ToList();
+            Console.WriteLine("Processing Repo Files...");
             var repoFiles = GetFileHashes(repoPath).ToList();
 
             foreach (var releaseFile in releaseFiles)
@@ -82,6 +84,7 @@ namespace ValidateReleaseFiles
                 var fileName = Path.GetFileName(filePath);
                 var hash = HashFile(filePath);
 
+                Console.WriteLine($"FileName: {fileName}, FilePath: {Path.GetFullPath(filePath)}, Hash: {hash}");
                 yield return (fileName, Path.GetFullPath(filePath), hash);
             }
         }
