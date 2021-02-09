@@ -13,3 +13,4 @@ runs:
   using: "composite"
   steps:
     - run: dotnet ${{ github.action_path }}/dist/ValidateReleaseFiles.dll '${{ inputs.releasePath }}' '${{ inputs.repoPath }}'
+      shell: pwsh
