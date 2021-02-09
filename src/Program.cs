@@ -82,7 +82,7 @@ namespace ValidateReleaseFiles
                 var fileName = Path.GetFileName(filePath);
                 var hash = HashFile(filePath);
 
-                yield return (fileName, filePath, hash);
+                yield return (fileName, Path.GetFullPath(filePath), hash);
             }
         }
 
