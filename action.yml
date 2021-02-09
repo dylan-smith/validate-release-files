@@ -1,0 +1,15 @@
+name: 'Validate Release Files'
+description: 'Checks that the files attached to a release match the files committed to the repo'
+inputs:
+  repoPath:
+    description: 'Path to the local git repository'
+    required: false
+    default: ${{ github.workspace }}
+  releasePath:
+    description: 'Path to the donwloaded release files'
+    required: false
+    default: '${{ github.workspace }}/release_files'
+runs:
+  using: "composite"
+  steps:
+    - run: dotnet ${{ github.action_path }}/dist/ValidateReleaseFiles.dll '${{ inputs.releasePath }}' '${{ inputs.repoPath }}'
